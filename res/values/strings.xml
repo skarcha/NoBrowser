@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NoBrowser</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="fetching_error">Error fetching the content.</string>
+    <string name="redirecting_to">Redirecting to:</string>
+    <string name="show_redirect">Show redirected URL</string>
+    <string name="pref_cat_main">Main</string>
+    <string name="show_redirect_summary">Show the redirected URL where the short one redirects to</string>
+    <string name="ok">Ok</string>
+    <string name="settings">Settings</string>
+</resources>

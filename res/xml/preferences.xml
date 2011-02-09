@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/settings">
+    <PreferenceCategory android:key="main_group" android:title="@string/pref_cat_main"></PreferenceCategory><CheckBoxPreference android:disableDependentsState="true" android:title="@string/show_redirect" android:defaultValue="true" android:key="show_redirect" android:summary="@string/show_redirect_summary"></CheckBoxPreference>
+    
+</PreferenceScreen>

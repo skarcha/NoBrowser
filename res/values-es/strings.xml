@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="please_wait">Por favor, espere...</string>
+    <string name="fetching_error">Error recibiendo el contenido.</string>
+    <string name="redirecting_to">Redirigiendo a:</string>
+    <string name="show_redirect">Mostrar URL final</string>
+    <string name="pref_cat_main">Principal</string>
+    <string name="show_redirect_summary">Mostrar la URL a la que redirige la URL corta</string>
+    <string name="ok">Aceptar</string>
+    <string name="settings">Ajustes</string>
+</resources>
