@@ -10,14 +10,6 @@
         <activity android:name="com.skarcha.nobrowser.Main" android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"></action>
-                <data android:scheme="http" android:host="youtu.be"></data>
-                <category android:name="android.intent.category.DEFAULT"></category>
-                <category android:name="android.intent.category.BROWSABLE"></category>
-            </intent-filter>
-        </activity>
-        <activity android:name="com.skarcha.nobrowser.ViewContent" android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
                 <category android:name="android.intent.category.BROWSABLE"></category>
                 <data android:scheme="http" android:host="twitlonger.com" android:pathPattern="/show/.*"></data>
@@ -28,6 +20,18 @@
                 <category android:name="android.intent.category.DEFAULT"></category>
                 <category android:name="android.intent.category.BROWSABLE"></category>
                 <data android:scheme="http" android:host="tl.gd"></data>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
+                <data android:host="bit.ly" android:scheme="http"></data>
+                <data android:host="goo.gl" android:scheme="http"></data>
+                <data android:host="is.gd" android:scheme="http"></data>
+                <data android:host="kcy.me" android:scheme="http"></data>
+                <data android:host="t.co" android:scheme="http"></data>
+                <data android:host="u" android:scheme="http"></data>
+                <data android:host="youtu.be" android:scheme="http"></data>
             </intent-filter>
         </activity>
         <activity android:name="Preferences" android:theme="@android:style/Theme.Black" android:label="@string/app_name">
