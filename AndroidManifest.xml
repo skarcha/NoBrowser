@@ -30,7 +30,8 @@
                 <data android:host="is.gd" android:scheme="http"></data>
                 <data android:host="kcy.me" android:scheme="http"></data>
                 <data android:host="t.co" android:scheme="http"></data>
-                <data android:host="u" android:scheme="http"></data>
+                <data android:host="tinyurl.com" android:scheme="http"></data>
+                <data android:host="urlcorta.es" android:scheme="http"></data>
                 <data android:host="youtu.be" android:scheme="http"></data>
             </intent-filter>
         </activity>

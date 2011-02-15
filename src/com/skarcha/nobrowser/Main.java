@@ -169,6 +169,7 @@ public class Main extends Activity {
 			url.startsWith("http://is.gd") ||
 			url.startsWith("http://kcy.me") ||
 			url.startsWith("http://t.co") ||
+			url.startsWith("http://tinyurl.com") ||
 			url.startsWith("http://urlcorta.es") ||
 			url.startsWith("http://youtu.be"))
 		{
