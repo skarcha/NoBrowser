@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -179,6 +180,7 @@ public class Main extends Activity {
 
 	private String getFinalURL (String url) throws IOException, IOException {
 		HttpHost target;
+		HttpRequest request;
 
 		// Youtu.be special case
 		if (url.startsWith("http://youtu.be")) {
@@ -195,20 +197,20 @@ public class Main extends Activity {
 
 		HttpClient httpclient = new DefaultHttpClient();
 		try {
-            HttpHead httphead = new HttpHead(url);
-            HttpContext localContext = new BasicHttpContext();
-            HttpResponse response = httpclient.execute(httphead, localContext);
-            target = (HttpHost) localContext.getAttribute(
-                    ExecutionContext.HTTP_TARGET_HOST);
-        } finally {
-            httpclient.getConnectionManager().shutdown();
-        }
+			HttpHead httphead = new HttpHead(url);
+			HttpContext localContext = new BasicHttpContext();
+			HttpResponse response = httpclient.execute(httphead, localContext);
+			target  = (HttpHost) localContext.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+			request = (HttpRequest) localContext.getAttribute(ExecutionContext.HTTP_REQUEST);
+		} finally {
+			httpclient.getConnectionManager().shutdown();
+		}
 
-        if (target == null) {
-        	return null;
-        }
+		if (target == null) {
+			return null;
+		}
 
-		return target.toString();
+		return target.toString() + request.getRequestLine().getUri();
 	}
 
 	private void getPrefs() {
