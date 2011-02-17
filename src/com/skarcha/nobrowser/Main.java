@@ -50,7 +50,7 @@ public class Main extends Activity {
 		Intent i = getIntent();
 		String dataString = i.getDataString();
 		String finalUrl = null;
-		boolean finishIntent = true;
+		boolean finishActivity = true;
 
 		if (isShortener(dataString)) {
 			try {
@@ -70,19 +70,19 @@ public class Main extends Activity {
 			if (finalUrl.startsWith("http://www.twitlonger") ||
 				finalUrl.startsWith("http://tl.gd"))
 			{
-				finishIntent = processTwitlonger(finalUrl);
+				finishActivity = processTwitlonger(finalUrl);
 			}
 
 			else if (finalUrl.contains("://market.android.com")) {
-				finishIntent = processMarket(finalUrl);
+				finishActivity = processMarket(finalUrl);
 			}
 
 			else {
-				finishIntent = processDefault(finalUrl);
+				finishActivity = processDefault(finalUrl);
 			}
 		}
 
-		if (finishIntent) {
+		if (finishActivity) {
 			finish();
 		}
 	}
