@@ -35,6 +35,7 @@
                 <data android:host="bit.ly" android:scheme="http"></data>
                 <data android:host="goo.gl" android:scheme="http"></data>
                 <data android:host="is.gd" android:scheme="http"></data>
+                <data android:host="j.mp" android:scheme="http"></data>
                 <data android:host="kcy.me" android:scheme="http"></data>
                 <data android:host="t.co" android:scheme="http"></data>
                 <data android:host="tinyurl.com" android:scheme="http"></data>

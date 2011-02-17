@@ -199,6 +199,7 @@ public class Main extends Activity {
 		if (url.startsWith("http://bit.ly") ||
 			url.startsWith("http://goo.gl") ||
 			url.startsWith("http://is.gd") ||
+			url.startsWith("http://j.mp") ||
 			url.startsWith("http://kcy.me") ||
 			url.startsWith("http://t.co") ||
 			url.startsWith("http://tinyurl.com") ||
