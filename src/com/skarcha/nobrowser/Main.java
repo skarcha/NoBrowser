@@ -18,6 +18,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
@@ -30,6 +31,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -38,6 +40,7 @@ import android.widget.Toast;
 
 public class Main extends Activity {
 
+	private String UserAgent = null;
 	private boolean prefShowRedirect;
 	private ProgressDialog progress;
 	private String ContentText = null;
@@ -51,6 +54,8 @@ public class Main extends Activity {
 		String dataString = i.getDataString();
 		String finalUrl = null;
 		boolean finishActivity = true;
+
+		UserAgent = "Mozilla/5.0 (compatible; NoBrowser for Android/" + getVersionName() + ")";
 
 		if (isShortener(dataString)) {
 			try {
@@ -137,20 +142,21 @@ public class Main extends Activity {
 		String responseBody = null;
 
 		HttpClient httpclient = new DefaultHttpClient();
-        try {
-            HttpGet httpget = new HttpGet(url);
+		try {
+			httpclient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, UserAgent);
+			HttpGet httpget = new HttpGet(url);
 
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            responseBody = httpclient.execute(httpget, responseHandler);
-        } finally {
-            httpclient.getConnectionManager().shutdown();
-        }
+			ResponseHandler<String> responseHandler = new BasicResponseHandler();
+			responseBody = httpclient.execute(httpget, responseHandler);
+		} finally {
+			httpclient.getConnectionManager().shutdown();
+		}
 
-        if (responseBody == null) {
-        	return null;
-        }
+		if (responseBody == null) {
+			return null;
+		}
 
-        String description = null;
+		String description = null;
 		try {
 			JSONObject jsRespuesta = new JSONObject(responseBody);
 			description = jsRespuesta.getString("description");
@@ -232,6 +238,7 @@ public class Main extends Activity {
 		//HttpClient httpclient = new DefaultHttpClient();
 		HttpClient httpclient = getTolerantClient();
 		try {
+			httpclient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, UserAgent);
 			HttpHead httphead = new HttpHead(url);
 			HttpContext localContext = new BasicHttpContext();
 			HttpResponse response = httpclient.execute(httphead, localContext);
@@ -252,6 +259,18 @@ public class Main extends Activity {
         // Get the xml/preferences.xml preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefShowRedirect = prefs.getBoolean("show_redirect", true);
+	}
+
+	private String getVersionName() {
+		PackageInfo pinfo;
+
+		try {
+			pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+		} catch (android.content.pm.PackageManager.NameNotFoundException e) {
+			return null;
+		}
+
+		return pinfo.versionName;
 	}
 
 	private void toast(String texto) {
