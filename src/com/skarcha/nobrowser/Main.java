@@ -67,13 +67,13 @@ public class Main extends Activity {
 		}
 
 		if (finalUrl != null) {
-			if (finalUrl.startsWith("http://www.twitlonger") ||
-				finalUrl.startsWith("http://tl.gd"))
+			if (finalUrl.startsWith("http://www.twitlonger.com/") ||
+				finalUrl.startsWith("http://tl.gd/"))
 			{
 				finishActivity = processTwitlonger(finalUrl);
 			}
 
-			else if (finalUrl.contains("://market.android.com")) {
+			else if (finalUrl.contains("://market.android.com/")) {
 				finishActivity = processMarket(finalUrl);
 			}
 
@@ -196,15 +196,15 @@ public class Main extends Activity {
 
 	private boolean isShortener (String url) {
 
-		if (url.startsWith("http://bit.ly") ||
-			url.startsWith("http://goo.gl") ||
-			url.startsWith("http://is.gd") ||
-			url.startsWith("http://j.mp") ||
-			url.startsWith("http://kcy.me") ||
-			url.startsWith("http://t.co") ||
-			url.startsWith("http://tinyurl.com") ||
-			url.startsWith("http://urlcorta.es") ||
-			url.startsWith("http://youtu.be"))
+		if (url.startsWith("http://bit.ly/") ||
+			url.startsWith("http://goo.gl/") ||
+			url.startsWith("http://is.gd/") ||
+			url.startsWith("http://j.mp/") ||
+			url.startsWith("http://kcy.me/") ||
+			url.startsWith("http://t.co/") ||
+			url.startsWith("http://tinyurl.com/") ||
+			url.startsWith("http://urlcorta.es/") ||
+			url.startsWith("http://youtu.be/"))
 		{
 			return true;
 		}
@@ -217,7 +217,7 @@ public class Main extends Activity {
 		HttpRequest request;
 
 		// Youtu.be special case
-		if (url.startsWith("http://youtu.be")) {
+		if (url.startsWith("http://youtu.be/")) {
 			String YoutubeUrl = null;
 			try {
 				URI oldUri = new URI(url);
