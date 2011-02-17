@@ -25,6 +25,13 @@
                 <action android:name="android.intent.action.VIEW"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
                 <category android:name="android.intent.category.BROWSABLE"></category>
+                <data android:scheme="http" android:host="market.android.com"></data>
+                <data android:scheme="https" android:host="market.android.com"></data>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
                 <data android:host="bit.ly" android:scheme="http"></data>
                 <data android:host="goo.gl" android:scheme="http"></data>
                 <data android:host="is.gd" android:scheme="http"></data>

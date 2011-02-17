@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.net.ssl.SSLException;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -11,6 +13,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.conn.ssl.AbstractVerifier;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
@@ -66,6 +71,10 @@ public class Main extends Activity {
 				finalUrl.startsWith("http://tl.gd"))
 			{
 				finishIntent = processTwitlonger(finalUrl);
+			}
+
+			else if (finalUrl.contains("://market.android.com")) {
+				finishIntent = processMarket(finalUrl);
 			}
 
 			else {
@@ -153,6 +162,29 @@ public class Main extends Activity {
 		return description;
 	}
 
+	private boolean processMarket (String url) {
+		String MarketUrl = null;
+
+		try {
+			URI oldUri = new URI(url);
+			String path = oldUri.getPath();
+			String query = oldUri.getQuery();
+			MarketUrl = "market:/" + path + "?" + query;
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (MarketUrl != null) {
+			Intent intent = new Intent();
+			intent.setAction(Intent.ACTION_VIEW);
+			intent.setData(android.net.Uri.parse(MarketUrl));
+			startActivity(intent);
+		}
+
+		return true;
+	}
+
 	private boolean processDefault (String url) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
@@ -196,7 +228,8 @@ public class Main extends Activity {
 			return YoutubeUrl;
 		}
 
-		HttpClient httpclient = new DefaultHttpClient();
+		//HttpClient httpclient = new DefaultHttpClient();
+		HttpClient httpclient = getTolerantClient();
 		try {
 			HttpHead httphead = new HttpHead(url);
 			HttpContext localContext = new BasicHttpContext();
@@ -223,4 +256,62 @@ public class Main extends Activity {
 	private void toast(String texto) {
 		Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
 	}
+
+/*
+ * Black box for me at the moment.
+ * Extracted from: http://stackoverflow.com/questions/3135679/android-httpclient-hostname-in-certificate-didnt-match-example-com-exa/3136980#3136980
+ *
+ * This is the ugly hack to this message:
+ * javax.net.ssl.SSLException: hostname in certificate didn't match <market.android.com> != <*.google.com>
+ *
+ * Ugly hack start here...
+ */
+
+	class MyVerifier extends AbstractVerifier {
+
+		private final X509HostnameVerifier delegate;
+
+		public MyVerifier(final X509HostnameVerifier delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public void verify(String host, String[] cns, String[] subjectAlts)
+				throws SSLException {
+/*
+			boolean ok = false;
+			try {
+				delegate.verify(host, cns, subjectAlts);
+			} catch (SSLException e) {
+				for (String cn : cns) {
+					if (cn.startsWith("*.")) {
+						try {
+							delegate.verify(host, new String[] {
+								cn.substring(2) }, subjectAlts);
+							ok = true;
+						} catch (Exception e1) { }
+					}
+				}
+				if(!ok) throw e;
+			}
+*/
+		}
+	}
+
+	public DefaultHttpClient getTolerantClient() {
+		DefaultHttpClient client = new DefaultHttpClient();
+		SSLSocketFactory sslSocketFactory = (SSLSocketFactory) client
+				.getConnectionManager().getSchemeRegistry().getScheme("https")
+				.getSocketFactory();
+		final X509HostnameVerifier delegate = sslSocketFactory
+				.getHostnameVerifier();
+		if (!(delegate instanceof MyVerifier)) {
+			sslSocketFactory.setHostnameVerifier(new MyVerifier(delegate));
+		}
+		return client;
+	}
+
+/*
+ * Ugly hack ends here...
+ */
 }
