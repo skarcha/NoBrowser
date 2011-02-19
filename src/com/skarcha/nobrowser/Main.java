@@ -32,6 +32,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -52,38 +53,32 @@ public class Main extends Activity {
 		getPrefs();
 		Intent i = getIntent();
 		String dataString = i.getDataString();
-		String finalUrl = null;
-		boolean finishActivity = true;
 
 		UserAgent = "Mozilla/5.0 (compatible; NoBrowser for Android/" + getVersionName() + ")";
 
 		if (isShortener(dataString)) {
-			try {
-				finalUrl = getFinalURL (dataString);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (prefShowRedirect) {
-				toast(getString(R.string.redirecting_to) + " " + finalUrl);
-			}
+			new getFinalUrlTask().execute(dataString);
 		} else {
-			finalUrl = dataString;
+			processfinalUrl(dataString);
 		}
+	}
 
-		if (finalUrl != null) {
-			if (finalUrl.startsWith("http://www.twitlonger.com/") ||
-				finalUrl.startsWith("http://tl.gd/"))
+	private void processfinalUrl (String url) {
+		boolean finishActivity = true;
+
+		if (url != null) {
+			if (url.startsWith("http://www.twitlonger.com/") ||
+				url.startsWith("http://tl.gd/"))
 			{
-				finishActivity = processTwitlonger(finalUrl);
+				finishActivity = processTwitlonger(url);
 			}
 
-			else if (finalUrl.contains("://market.android.com/")) {
-				finishActivity = processMarket(finalUrl);
+			else if (url.contains("://market.android.com/")) {
+				finishActivity = processMarket(url);
 			}
 
 			else {
-				finishActivity = processDefault(finalUrl);
+				finishActivity = processDefault(url);
 			}
 		}
 
@@ -216,6 +211,39 @@ public class Main extends Activity {
 		}
 
 		return false;
+	}
+
+	private class getFinalUrlTask extends AsyncTask<String, Void, String> {
+		private final ProgressDialog dialog = new ProgressDialog(Main.this);
+
+		@Override
+		protected void onPreExecute() {
+			this.dialog.setMessage(getString(R.string.please_wait));
+			this.dialog.show();
+		}
+
+		@Override
+		protected String doInBackground(final String... args) {
+			String finalUrl = null;
+			try {
+				finalUrl = Main.this.getFinalURL(args[0]);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return finalUrl;
+		}
+
+		@Override
+		protected void onPostExecute(final String url) {
+			if (this.dialog.isShowing()) {
+				this.dialog.dismiss();
+			}
+			if (prefShowRedirect) {
+				toast(getString(R.string.redirecting_to) + " " + url);
+			}
+			Main.this.processfinalUrl(url);
+		}
 	}
 
 	private String getFinalURL (String url) throws IOException, IOException {
