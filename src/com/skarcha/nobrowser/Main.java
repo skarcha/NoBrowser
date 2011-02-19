@@ -34,8 +34,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -43,8 +41,6 @@ public class Main extends Activity {
 
 	private String UserAgent = null;
 	private boolean prefShowRedirect;
-	private ProgressDialog progress;
-	private String ContentText = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,77 +59,82 @@ public class Main extends Activity {
 		}
 	}
 
-	private void processfinalUrl (String url) {
-		boolean finishActivity = true;
+	private void finishActivity() {
+		finish();
+	}
 
+	private void processfinalUrl (String url) {
 		if (url != null) {
 			if (url.startsWith("http://www.twitlonger.com/") ||
 				url.startsWith("http://tl.gd/"))
 			{
-				finishActivity = processTwitlonger(url);
+				new processTwitlongerTask().execute(url);
 			}
 
 			else if (url.contains("://market.android.com/")) {
-				finishActivity = processMarket(url);
+				processMarket(url);
 			}
 
 			else {
-				finishActivity = processDefault(url);
+				processDefault(url);
 			}
-		}
-
-		if (finishActivity) {
-			finish();
+		} else {
+			finishActivity();
 		}
 	}
 
-	private boolean processTwitlonger(String url) {
-		final String tmpUrl = "http://api.embed.ly/1/oembed?url=" + url + "&format=json";
+	private class processTwitlongerTask extends AsyncTask<String, Void, String> {
+		private final ProgressDialog dialog = new ProgressDialog(Main.this);
 
-		this.progress = ProgressDialog.show(this, "", getText(R.string.please_wait), false);
-
-		Thread th = new Thread() {
-			@Override
-			public void run() {
-				try {
-					ContentText = getContent(tmpUrl);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} finally {
-					handler.sendEmptyMessage(0);
-				}
-			}
-		};
-		th.start();
-
-		return false;
-	}
-
-	private final Handler handler = new Handler() {
 		@Override
-		public void handleMessage(Message msg) {
-			progress.dismiss();
+		protected void onPreExecute() {
+			this.dialog.setMessage(getString(R.string.please_wait));
+			this.dialog.show();
+		}
+
+		@Override
+		protected String doInBackground(final String... args) {
+			final String tmpUrl = "http://api.embed.ly/1/oembed?url=" + args[0] + "&format=json";
+			String ContentText = null;
+
+			try {
+				ContentText = Main.this.getTwitlongerContent(tmpUrl);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return ContentText;
+		}
+
+		@Override
+		protected void onPostExecute(final String ContentText) {
+			String tweetText = null;
+
+			if (this.dialog.isShowing()) {
+				this.dialog.dismiss();
+			}
 
 			if (ContentText == null) {
-				ContentText = (String) getText(R.string.fetching_error);
+				tweetText = getString(R.string.fetching_error);
+			} else {
+				tweetText = ContentText;
 			}
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(Main.this);
 			builder.setTitle("Twitlonger")
-				   .setMessage(ContentText)
+				   .setMessage(tweetText)
 			       .setCancelable(false)
 			       .setNeutralButton(getText(R.string.ok), new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {
-			                Main.this.finish();
+			                Main.this.finishActivity();
 			           }
 			       });
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-	};
+	}
 
-	private String getContent (String url) throws IOException, IOException {
+	private String getTwitlongerContent (String url) throws IOException, IOException {
 		String responseBody = null;
 
 		HttpClient httpclient = new DefaultHttpClient();
@@ -163,7 +164,7 @@ public class Main extends Activity {
 		return description;
 	}
 
-	private boolean processMarket (String url) {
+	private void processMarket (String url) {
 		String MarketUrl = null;
 
 		try {
@@ -183,16 +184,16 @@ public class Main extends Activity {
 			startActivity(intent);
 		}
 
-		return true;
+		finishActivity();
 	}
 
-	private boolean processDefault (String url) {
+	private void processDefault (String url) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
 		intent.setData(android.net.Uri.parse(url));
 		startActivity(intent);
 
-		return true;
+		finishActivity();
 	}
 
 	private boolean isShortener (String url) {
