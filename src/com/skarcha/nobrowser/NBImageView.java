@@ -44,7 +44,11 @@ public class NBImageView extends Activity {
 			finish();
 		}
 
-		new getImageTask().execute(dataString);
+		if (dataString == null) {
+			finish();
+		} else {
+			new getImageTask().execute(dataString);
+		}
     }
 
 	private void showImage (Drawable drawable) {
