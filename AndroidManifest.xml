@@ -49,6 +49,16 @@
                 <category android:name="android.intent.category.LAUNCHER"></category>
             </intent-filter>
         </activity>
+        <activity android:name="NBImageView" android:theme="@android:style/Theme.Black" android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
+                <data android:host="yfrog.com" android:scheme="http"></data>
+                <data android:host="twitpic.com" android:scheme="http"></data>
+                <data android:host="picplz.com" android:scheme="http"></data>
+            </intent-filter>
+        </activity>
 
     </application>
 </manifest>

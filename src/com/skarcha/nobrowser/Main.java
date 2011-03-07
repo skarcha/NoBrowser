@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.net.ssl.SSLException;
-
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -13,12 +11,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.conn.ssl.AbstractVerifier;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
@@ -31,7 +24,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -39,7 +31,7 @@ import android.widget.Toast;
 
 public class Main extends Activity {
 
-	private String UserAgent = null;
+	private final String UserAgent = null;
 	private boolean prefShowRedirect;
 
 	@Override
@@ -49,8 +41,6 @@ public class Main extends Activity {
 		getPrefs();
 		Intent i = getIntent();
 		String dataString = i.getDataString();
-
-		UserAgent = "Mozilla/5.0 (compatible; NoBrowser for Android/" + getVersionName() + ")";
 
 		if (isShortener(dataString)) {
 			new getFinalUrlTask().execute(dataString);
@@ -137,9 +127,8 @@ public class Main extends Activity {
 	private String getTwitlongerContent (String url) throws IOException, IOException {
 		String responseBody = null;
 
-		HttpClient httpclient = new DefaultHttpClient();
+		HttpClient httpclient = new Network().getTolerantClient();
 		try {
-			httpclient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, UserAgent);
 			HttpGet httpget = new HttpGet(url);
 
 			ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -265,9 +254,8 @@ public class Main extends Activity {
 		}
 
 		//HttpClient httpclient = new DefaultHttpClient();
-		HttpClient httpclient = getTolerantClient();
+		HttpClient httpclient = new Network().getTolerantClient();
 		try {
-			httpclient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, UserAgent);
 			HttpHead httphead = new HttpHead(url);
 			HttpContext localContext = new BasicHttpContext();
 			HttpResponse response = httpclient.execute(httphead, localContext);
@@ -290,77 +278,7 @@ public class Main extends Activity {
         prefShowRedirect = prefs.getBoolean("show_redirect", true);
 	}
 
-	private String getVersionName() {
-		PackageInfo pinfo;
-
-		try {
-			pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-		} catch (android.content.pm.PackageManager.NameNotFoundException e) {
-			return null;
-		}
-
-		return pinfo.versionName;
-	}
-
 	private void toast(String texto) {
 		Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
 	}
-
-/*
- * Black box for me at the moment.
- * Extracted from: http://stackoverflow.com/questions/3135679/android-httpclient-hostname-in-certificate-didnt-match-example-com-exa/3136980#3136980
- *
- * This is the ugly hack to this message:
- * javax.net.ssl.SSLException: hostname in certificate didn't match <market.android.com> != <*.google.com>
- *
- * Ugly hack start here...
- */
-
-	class MyVerifier extends AbstractVerifier {
-
-		private final X509HostnameVerifier delegate;
-
-		public MyVerifier(final X509HostnameVerifier delegate) {
-			this.delegate = delegate;
-		}
-
-		@Override
-		public void verify(String host, String[] cns, String[] subjectAlts)
-				throws SSLException {
-/*
-			boolean ok = false;
-			try {
-				delegate.verify(host, cns, subjectAlts);
-			} catch (SSLException e) {
-				for (String cn : cns) {
-					if (cn.startsWith("*.")) {
-						try {
-							delegate.verify(host, new String[] {
-								cn.substring(2) }, subjectAlts);
-							ok = true;
-						} catch (Exception e1) { }
-					}
-				}
-				if(!ok) throw e;
-			}
-*/
-		}
-	}
-
-	public DefaultHttpClient getTolerantClient() {
-		DefaultHttpClient client = new DefaultHttpClient();
-		SSLSocketFactory sslSocketFactory = (SSLSocketFactory) client
-				.getConnectionManager().getSchemeRegistry().getScheme("https")
-				.getSocketFactory();
-		final X509HostnameVerifier delegate = sslSocketFactory
-				.getHostnameVerifier();
-		if (!(delegate instanceof MyVerifier)) {
-			sslSocketFactory.setHostnameVerifier(new MyVerifier(delegate));
-		}
-		return client;
-	}
-
-/*
- * Ugly hack ends here...
- */
 }
