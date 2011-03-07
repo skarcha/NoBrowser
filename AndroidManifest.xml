@@ -49,7 +49,7 @@
                 <category android:name="android.intent.category.LAUNCHER"></category>
             </intent-filter>
         </activity>
-        <activity android:name="NBImageView" android:theme="@android:style/Theme.Black">
+        <activity android:name="NBImageView" android:theme="@android:style/Theme.Black" android:configChanges="keyboardHidden|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>

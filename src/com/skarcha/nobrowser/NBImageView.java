@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -50,6 +51,12 @@ public class NBImageView extends Activity {
 			new getImageTask().execute(dataString);
 		}
     }
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		//setContentView(R.layout.nbimageview);
+	}
 
 	private void showImage (Drawable drawable) {
 		ImageView imgView =(ImageView)findViewById(R.id.imageView1);
@@ -134,5 +141,4 @@ public class NBImageView extends Activity {
 
 		return null;
 	}
-
 }
